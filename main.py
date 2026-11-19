@@ -3,6 +3,7 @@ import os
 import sys
 import hashlib
 import pathlib
+import stat
 
 EXPECTED_BYTES = 218373
 EXPECTED_SHA256 = "7a65cc6126dab180a06871bccd0c05afd3b85dbcb43b2ad119e15b09db0ef9bc"
@@ -91,6 +92,9 @@ def main():
     re_sha256 = hashlib.sha256(re_data).hexdigest()
     if re_bytes != EXPECTED_BYTES or re_sha256 != EXPECTED_SHA256:
         raise SystemExit("Verification failed after writing entry.png")
+        
+    if stat.S_IMODE(entry_path.stat().st_mode) != 0o644:
+        raise SystemExit("Permission bits verification failed: expected 0o644")
         
     print(f"Success: dimensions {width}x{height}, byte count {re_bytes}")
 
